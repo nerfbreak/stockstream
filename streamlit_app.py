@@ -74,7 +74,7 @@ col1, col2 = st.columns(2)
 with col1:
     # Ditambahkan type 'zip'
     file1 = st.file_uploader("Upload File Stock Newspage", type=['csv', 'xlsx', 'zip'])
-    st.caption("Support: .csv, .xlsx, .zip (isi INVT_MASTER)")
+    st.caption("Support: .csv, .xlsx, .zip")
 
 with col2:
     file2 = st.file_uploader("Upload File Stock Distributor", type=['csv', 'xlsx'])
