@@ -109,8 +109,6 @@ if file1 and file2:
             sku_col2 = st.selectbox("Kolom SKU (Distributor)", df2.columns, index=idx_sku2)
             qty_col2 = st.selectbox("Kolom Qty (Distributor)", df2.columns, index=idx_qty2)
 
-        st.markdown("#") # Spacer
-
         if st.button("Compare", type="primary"):
             # Proses Data Newspage
             d1 = df1[[sku_col1, qty_col1]].copy()
