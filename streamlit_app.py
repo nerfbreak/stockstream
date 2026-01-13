@@ -74,7 +74,7 @@ col1, col2 = st.columns(2)
 with col1:
     # Ditambahkan type 'zip'
     file1 = st.file_uploader("Upload File Stock Newspage", type=['csv', 'xlsx', 'zip'])
-    st.caption("Support: .csv, .xlsx, .zip")
+    st.caption("Support: .csv, .xlsx, .zip (isi INVT_MASTER)")
 
 with col2:
     file2 = st.file_uploader("Upload File Stock Distributor", type=['csv', 'xlsx'])
@@ -113,12 +113,20 @@ if file1 and file2:
             # Proses Data Newspage
             d1 = df1[[sku_col1, qty_col1]].copy()
             d1[sku_col1] = d1[sku_col1].astype(str).str.strip()
+            
+            # --- FIX: Ensure Qty is Number ---
+            d1[qty_col1] = pd.to_numeric(d1[qty_col1], errors='coerce').fillna(0)
+            
             d1_agg = d1.groupby(sku_col1)[qty_col1].sum().reset_index()
             d1_agg.rename(columns={sku_col1: 'SKU', qty_col1: 'Newspage'}, inplace=True)
 
             # Proses Data Distributor
             d2 = df2[[sku_col2, qty_col2]].copy()
             d2[sku_col2] = d2[sku_col2].astype(str).str.strip()
+            
+            # --- FIX: Ensure Qty is Number ---
+            d2[qty_col2] = pd.to_numeric(d2[qty_col2], errors='coerce').fillna(0)
+
             d2_agg = d2.groupby(sku_col2)[qty_col2].sum().reset_index()
             d2_agg.rename(columns={sku_col2: 'SKU', qty_col2: 'Distributor'}, inplace=True)
 
