@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import zipfile
 
-# --- Helper Functions ---
+# --- Helper ---
 def load_data(file):
     if file is None: return None
     df = None
@@ -11,7 +11,7 @@ def load_data(file):
     # 1. CSV
     if filename.endswith('.csv'):
         try:
-            # Coba delimiter TAB dulu
+            # Delimiter Tab
             df = pd.read_csv(file, sep='\t', dtype=str) 
             if df.shape[1] <= 1: 
                  file.seek(0)
@@ -50,15 +50,15 @@ def load_data(file):
                     with z.open(target_filename) as f:
                         df = pd.read_csv(f, sep='\t', dtype=str)
                 else:
-                    st.error("Tidak ditemukan file CSV di dalam file ZIP ini.")
+                    st.error("CSV Not Found.")
                     return None
         except Exception as e:
-            st.error(f"Gagal membaca file ZIP: {e}")
+            st.error(f"Fail Read Zip: {e}")
             return None
             
     return df
 
-# --- Main App ---
+# --- App ---
 st.set_page_config(page_title="Inventory Reconcile", layout="wide")
 st.title("Inventory Reconcile")
 
@@ -78,7 +78,7 @@ if file1 and file2:
 
     if df1 is not None and df2 is not None:
         
-        # --- Konfigurasi Kolom ---
+        # --- Config Kolom ---
         c1, c2 = st.columns(2)
         with c1:
             st.subheader("Newspage")
@@ -97,14 +97,14 @@ if file1 and file2:
         if st.button("Compare", type="primary"):
             # 1. Proses Newspage
             d1 = df1[[sku_col1, qty_col1]].copy()
-            # Pembersihan Data: Hapus desimal .0 jika ada, lalu strip spasi
+            # Hapus desimal .0
             d1[sku_col1] = d1[sku_col1].astype(str).str.split('.').str[0].str.strip()
             d1[qty_col1] = pd.to_numeric(d1[qty_col1], errors='coerce').fillna(0)
             d1_agg = d1.groupby(sku_col1)[qty_col1].sum().reset_index().rename(columns={sku_col1: 'SKU', qty_col1: 'Newspage'})
 
             # 2. Proses Distributor
             d2 = df2[[sku_col2, qty_col2]].copy()
-            # Pembersihan Data
+            # CLear Data
             d2[sku_col2] = d2[sku_col2].astype(str).str.split('.').str[0].str.strip()
             
             # --- AUTO FIX SKU ---
@@ -123,10 +123,10 @@ if file1 and file2:
             merged['Selisih'] = merged['Distributor'] - merged['Newspage']
             merged['Status'] = merged['Selisih'].apply(lambda x: 'Match' if x == 0 else 'Mismatch')
 
-            # --- TAMPILKAN HASIL ---
+            # --- SHow result ---
             st.success("Results")
             
-            # Metric Ringkas
+            # Metric
             m1, m2 = st.columns(2)
             m1.metric("Total Match", len(merged[merged['Selisih'] == 0]))
             m2.metric("Total Mismatch", len(merged[merged['Selisih'] != 0]), delta_color="inverse")
